@@ -16,3 +16,29 @@ This project is implemented to achieve 4 module detection
 pip install -r requirements.txt
 ~~~
 
+
+### 1. Create Datset
+
+
+### 2. Train
+
+
+### 3. Inference
+
+#### 3-1) inference with trained model 
+download models from [https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx](https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx)
+
+and place it ..
+
+~~~
+/models/back_crack/mask_rcnn_toothbrush_crack_0069.h5
+/models/brush/mask_rcnn_toothbrush_head_0020.h5
+/models/brush/efficient-best_weight_220119_2.h5
+/models/brush/eff0_220928_2.h5
+/models/front_crack/mask_rcnn_toothbrush_crack_0084.h5
+~~~
+
+
+#### 3-2) inference with your trained model with custom data
+
+place wherever you want
