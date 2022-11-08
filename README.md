@@ -20,13 +20,10 @@ pip install -r requirements.txt
 ### 1. Create Datset
 
 
-### 2. Train
+### 2. Demo
 
-
-### 3. Inference
-
-#### 3-1) inference with trained model 
-download models from [https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx](https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx)
+#### 1) inference with trained model 
+download models from [trained models](https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx)
 
 and place it ..
 
@@ -39,6 +36,27 @@ and place it ..
 ~~~
 
 
-#### 3-2) inference with your trained model with custom data
+#### 1-1) inference with your trained model with custom data
 
 place wherever you want
+
+1. Detect defect toothbrush from frontal toothbrush image
+~~~
+python toothbrush_head_final.py
+~~~
+
+2. Detect defect crack from frontal toothbrush image
+~~~
+python toothbrush_crack_final.py
+~~~
+
+
+3. Detect defect side toothbrush from side toothbrush image
+~~~
+python toothbrush_side_final.py
+~~~
+
+4. Detect defect crack from back toothbrush image
+~~~
+python toothbrush_back_final.py
+~~~
