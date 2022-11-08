@@ -17,8 +17,15 @@ pip install -r requirements.txt
 ~~~
 
 
-### 1. Create Datset
+### 1. Download Datset
 
+download dataset from [datasets](https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx)
+
+download `datasets.tar` and untar
+
+~~~
+tar -xvf datasets.tar 
+~~~
 
 ### 2. Demo
 
