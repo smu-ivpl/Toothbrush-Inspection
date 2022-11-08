@@ -40,6 +40,8 @@ and place it ..
 
 place wherever you want
 
+
+
 1. Detect defect toothbrush from frontal toothbrush image
 ~~~
 python toothbrush_head_final.py
@@ -49,6 +51,11 @@ python toothbrush_head_final.py
 ~~~
 python toothbrush_crack_final.py
 ~~~
+
+
+### 3. Visualize
+
+
 
 
 3. Detect defect side toothbrush from side toothbrush image
