@@ -29,6 +29,14 @@ tar -xvf datasets.tar
 
 ### 2. Demo
 
+
+#### 0) inference 4 modules in real time
+
+~~~
+python new_main.py
+~~~
+
+
 #### 1) inference with trained model 
 download models from [trained models](https://sookmyungackr.sharepoint.com/sites/dr_noah/Shared%20Documents/Forms/AllItems.aspx)
 
