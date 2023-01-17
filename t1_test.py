@@ -27,7 +27,6 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import brush_visualize
-import time
 
 DEFAULT_IMAGE_DIR = "/home/vi/VisionData/image/CAM1"
 ############################################################
@@ -135,9 +134,9 @@ class Toothbrush(Process):
 
     def binary_classification(self, image_path, imgname, model, crop_list): 
         ## check number of brushes
-        try:
+        if os.path.exists(image_path):
             im = Image.open(image_path)
-        except :
+        else:
             print("already finished in t2.py")
             return 0
         
@@ -197,7 +196,8 @@ def head_brush(**kwargs):
     in_que3 = kwargs['que_in_3'] 
     out_que3 = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
-    out_que4 = kwargs['que_out_4'] 
+    out_que4 = kwargs['que_out_4']
+    lock = kwargs['lock']
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
@@ -219,6 +219,9 @@ def head_brush(**kwargs):
                 return 0
 
 
+            print("!!!!!!!!!!!!start!!!!!!!!! => ", img_dir, "!!!!!!!!")
+            print(" ############################# t1.py start! #############################")
+
             result_path = DEFAULT_IMAGE_DIR+'/result'
 
             if not os.path.isdir(result_path):
@@ -231,24 +234,34 @@ def head_brush(**kwargs):
             #crop_list = Toothbrush.detect_and_color_splash(brush_model, image_path=img_dir, img_file_name=imgname)
             crop_list = kwargs['bmodel'].detect_and_color_splash(brush_model,image_path=img_dir, img_file_name=imgname)
             result = kwargs['bmodel'].binary_classification(img_dir, onlyname, eff_model, crop_list)
-            
             #00055_&Cam3Img.bmp
+            #00051_&Cam2Img.bmp
             cam2_num = int(imgname.split("_")[0]) + 5
             cam3_num = int(imgname.split("_")[0]) + 10
             cam2_dir = os.path.join(CAM2+str(cam2_num).zfill(5)+"_&Cam2Img.bmp")
             cam3_dir = os.path.join(CAM3+str(cam3_num).zfill(5)+"_&Cam3Img.bmp")
             
             if result:
-                os.rename(img_dir, img_dir.split('.')[0] + '_1000.png')
-                if os.path.exists(cam2_dir):
-                    os.rename(cam2_dir, cam2_dir.split('.')[0] + '_1000.png')
+                if not os.path.exists(img_dir):
+                    return 0
+
+                
+                if os.path.exists(img_dir):
+                    os.rename(img_dir, img_dir.split('.')[0] + '_1000.png')
                     
-                if os.path.exists(cam3_dir):
-                    os.rename(cam3_dir, cam3_dir.split('.')[0] + '_1000.png')
+                    if os.path.exists(cam2_dir):
+                        os.rename(cam2_dir, cam2_dir.split('.')[0] + '_1000.png')
+                        
+                    if os.path.exists(cam3_dir):
+                        os.rename(cam3_dir, cam3_dir.split('.')[0] + '_1000.png')
 
                 if not in_que2.empty():
-                    in_que2.pop()
-                    #out_que2()
+                    in_que2.remove(img_dir)
+                    #in_que2.pop()
+                    
+                    
+                    
+            else:
                 out_que.put(img_dir)
 
             submission[onlyname] = result
