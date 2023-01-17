@@ -157,42 +157,49 @@ def head_crack(**kwargs):
     in_que3 = kwargs['que_in_3'] 
     out_que3 = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
-    out_que4 = kwargs['que_out_4'] 
+    out_que4 = kwargs['que_out_4']
+    lock = kwargs['lock']
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
     CAM3 = kwargs['cam3']
 
     while not kwargs['stop_event'].wait(1e-9):
-        if in_que.qsize() > 0:                    
+        if in_que.qsize() > 0:
+            print(" ############################# t2.py start! #############################")                    
             img_dir = in_que.pop()
             
             if not os.path.exists(img_dir):
                 return 0
 
-
+            
             imgname = img_dir.split("/")[-1]
             onlyname = imgname.split(".")[0]
-
             error, mTime = kwargs['cmodel'].detect_and_color_splash(headcrack_model, image_path=folder_dir,  img_file_name=imgname, img_dir = img_dir)
-         
-        
             cam2_num = int(imgname.split("_")[0]) + 5
             cam3_num = int(imgname.split("_")[0]) + 10
             cam2_dir = os.path.join(CAM2+str(cam2_num).zfill(5)+"_&Cam2Img.bmp")
             cam3_dir = os.path.join(CAM3+str(cam3_num).zfill(5)+"_&Cam3Img.bmp")
             if error:
-                print(f"{imgname} has head crack error")
-                os.rename(img_dir, img_dir.split('.')[0] + '_0100.png')
+                if not os.path.exists(img_dir):
+                    return 0
                 
-                if os.path.exists(cam2_dir):
-                    os.rename(cam2_dir, cam2_dir.split('.')[0] + '_0100.png')
-                    
-                if os.path.exists(cam3_dir):
-                    os.rename(cam3_dir, cam3_dir.split('.')[0] + '_0100.png')
+                print(f"{imgname} has head crack error")
+                if os.path.exists(img_dir):
+                    os.rename(img_dir, img_dir.split('.')[0] + '_0100.png')
+                 
+                    if os.path.exists(cam2_dir):
+                        os.rename(cam2_dir, cam2_dir.split('.')[0] + '_0100.png')
+                        
+                    if os.path.exists(cam3_dir):
+                        os.rename(cam3_dir, cam3_dir.split('.')[0] + '_0100.png')
 
                 if not in_que1.empty():
-                    in_que1.pop()
+                    in_que1.remove(img_dir)
+                    #in_que1.pop()
+            else:
                 out_que.put(img_dir)
+            
+            
 
     #return error
