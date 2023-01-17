@@ -2,11 +2,12 @@ import sys
 from threading import Thread, Event
 from collections import deque
 from pathlib import Path
-from multiprocessing import Process
+from multiprocessing import Process, Lock
 from t1_test import *
 from t2_test import *
 from t3_test import *
 from t4_test import *
+from check_normal import *
 import time
 import Loading_models
 from watchdog.observers import Observer
@@ -44,6 +45,8 @@ def main():
     args['que_out_3'] = out_que_3
     args['que_in_4'] = in_que_4
     args['que_out_4'] = out_que_4
+    
+    args['check_norm'] = CheckingNorm()
     args['stop_event'] = Event()
 
     que = Thread(target=Checking)
@@ -51,12 +54,15 @@ def main():
     t2 = Thread(target=head_crack, kwargs=args)
     t3 = Thread(target=side_brush, kwargs=args)
     t4 = Thread(target=back_crack, kwargs=args)
+    norm = Thread(target=check_norm, kwargs=args)
 
     que.start()
     t1.start()
     t2.start()
     t3.start()
     t4.start()
+    norm.start()
+    
 
 if __name__ == "__main__":
     main()
