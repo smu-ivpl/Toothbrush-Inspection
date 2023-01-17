@@ -24,17 +24,21 @@ class SideToothbrush(Process):
         Process.__init__(self)
 
     def run(self, imgname, _img):
+        print(" ############################# t3.py start! #############################")
         
         a_list = []
         b_list = []
         c_list = []
 
         try:
-            image = cv2.imread(imgname)
+            if os.path.exists(imgname):
+                image = cv2.imread(imgname)
+            else:
+                return 0    
+            #image = imageio.imread(imgname)
+            
             image = cv2.resize(image, (700, 500))
         
-        
-
             img = image.copy()  # contour 좌표를 구하기 위한 원본 복사 이미지
             img1 = image.copy()  # ROI영역을 만들기 위한 원본 복사 이미지1
             img_morph = image.copy()
@@ -343,6 +347,7 @@ class SideToothbrush(Process):
                 err = 0
                 return err
         except:
+            
             return 0
 
 
@@ -480,7 +485,8 @@ def side_brush(**kwargs):
     in_que = kwargs['que_in_3'] 
     out_que = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
-    out_que4 = kwargs['que_out_4'] 
+    out_que4 = kwargs['que_out_4']
+    lock = kwargs['lock']
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
@@ -495,24 +501,26 @@ def side_brush(**kwargs):
 
             if not os.path.exists(image_path):
                 return 0
-
-            _img = image_path.split("/")[-1]
-            result = kwargs['smodel'].run(image_path, _img)
-
-            
-            cam1_num = int(_img.split("_")[0]) - 5
-            cam3_num = int(_img.split("_")[0]) + 5
-            cam1_dir = os.path.join(CAM1+str(cam1_num).zfill(5)+"_&Cam1Img.bmp")
-            cam3_dir = os.path.join(CAM3+str(cam3_num).zfill(5)+"_&Cam3Img.bmp")
-
-
-            if result:
-                os.rename(image_path, image_path.split('.')[0] + '_0010.png')
+            else:
+                _img = image_path.split("/")[-1]
                 
-                if os.path.exists(cam1_dir):
-                    os.rename(cam1_dir, cam1_dir.split('.')[0] + '_0010.png')
-                if os.path.exists(cam3_dir):
-                    os.rename(cam3_dir, cam3_dir.split('.')[0] + '_0010.png')
-                out_que.put(image_path)
+                result = kwargs['smodel'].run(image_path, _img)
+                
+                cam1_num = int(_img.split("_")[0]) - 5
+                cam3_num = int(_img.split("_")[0]) + 5
+                cam1_dir = os.path.join(CAM1+str(cam1_num).zfill(5)+"_&Cam1Img.bmp")
+                cam3_dir = os.path.join(CAM3+str(cam3_num).zfill(5)+"_&Cam3Img.bmp")
+    
+                
+                if result:
+                    if os.path.exists(image_path):
+                        os.rename(image_path, image_path.split('.')[0] + '_0010.png')
+                        if os.path.exists(cam1_dir):
+                            os.rename(cam1_dir, cam1_dir.split('.')[0] + '_0010.png')
+                        if os.path.exists(cam3_dir):
+                            os.rename(cam3_dir, cam3_dir.split('.')[0] + '_0010.png')
+                    
+                else:
+                    out_que.put(cam1_dir)
 
 
