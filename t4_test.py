@@ -208,6 +208,9 @@ class BackCrack(Process):
         # Run model detection and generate the color splash effect
         print("Running on {}".format(image_path))
         # Read image
+        if not os.path.exists(image_path):
+            return 0
+                    
         image = skimage.io.imread(image_path)
         # Detect objects
         start = time.time()
@@ -281,6 +284,8 @@ def back_crack(**kwargs):
     out_que = kwargs['que_out_4'] 
     model = kwargs['model_bcrack']
     image_dir = kwargs['default_image_dir']
+    lock = kwargs['lock']
+    
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
@@ -289,6 +294,7 @@ def back_crack(**kwargs):
 
     while not kwargs['stop_event'].wait(1e-9):
         if in_que.qsize() > 0:
+            print(" ############################# t4.py start! #############################")
             img = in_que.pop()
             imgname = img.split("/")[-1]
             onlyname, _ = os.path.splitext(imgname)
@@ -302,11 +308,18 @@ def back_crack(**kwargs):
             cam1_dir = os.path.join(CAM1+str(cam1_num).zfill(5)+"_&Cam1Img.bmp")
             cam2_dir = os.path.join(CAM2+str(cam2_num).zfill(5)+"_&Cam2Img.bmp")
             if error:
+                if not os.path.exists(img):
+                    return 0
                 print(f"{imgname_bmp} has back crack! error image")
-                os.rename(img, img.split('.')[0] + '_0001.png')
-                os.rename(cam1_dir, cam1_dir.split('.')[0] + '_0001.png')
-                os.rename(cam2_dir, cam2_dir.split('.')[0] + '_0001.png')
-                out_que.put(img)
-
+                if os.path.exists(img):
+                    os.rename(img, img.split('.')[0] + '_0001.png')
+                    if os.path.exists(cam1_dir):
+                        os.rename(cam1_dir, cam1_dir.split('.')[0] + '_0001.png')
+                    if os.path.exists(cam2_dir):
+                        os.rename(cam2_dir, cam2_dir.split('.')[0] + '_0001.png')
+              
+            else:
+                out_que.put(cam1_dir)
+          
 
 
