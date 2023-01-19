@@ -32,8 +32,8 @@ class SideToothbrush(Process):
 
         try:
             if os.path.exists(imgname):
-                print("sleep for 2 sec!")
-                time.sleep(2)
+                # print("sleep for 2 sec!")
+                time.sleep(1)
                 image = cv2.imread(imgname)
             else:
                 return 0
@@ -300,7 +300,7 @@ class SideToothbrush(Process):
                                     (255, 255, 255), 1,
                                     cv2.LINE_AA)
                         # cv2.imshow("postprocessing B type: ", brush_draw2)
-                        cv2.imwrite(f"./datasets/side_brush/side_result/error_B/err_B_{_img}", brush_draw2)
+                        # cv2.imwrite(f"./datasets/side_brush/side_result/error_B/err_B_{_img}", brush_draw2)
                         err = 1
                         return err
                     else:
@@ -484,20 +484,20 @@ def side_brush(**kwargs):
     out_que1= kwargs['que_out_1']
     in_que2 = kwargs['que_in_2'] 
     out_que2 = kwargs['que_out_2'] 
-    in_que = kwargs['que_in_3'] 
-    out_que = kwargs['que_out_3'] 
+    in_que3 = kwargs['que_in_3'] 
+    out_que3 = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
     out_que4 = kwargs['que_out_4']
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
     CAM3 = kwargs['cam3']
-    tmp_q = in_que
+    tmp_q = in_que3
     
     while not kwargs['stop_event'].wait(1e-9):
-        if in_que.qsize() > 0:
+        if in_que3.qsize() > 0:
             
         
-            image_path= in_que.pop()
+            image_path= in_que3.pop()
 
             if not os.path.exists(image_path):
                 continue
@@ -521,5 +521,5 @@ def side_brush(**kwargs):
                             os.rename(cam3_dir, cam3_dir.split('.')[0] + '_0010.png')
                     
                 else:
-                    out_que.put(cam1_dir)
+                    out_que3.put(cam1_dir)
 
