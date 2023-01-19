@@ -152,8 +152,8 @@ def head_crack(**kwargs):
     folder_dir = kwargs['default_image_dir'] 
     in_que1 = kwargs['que_in_1']
     out_que1 = kwargs['que_out_1']
-    in_que = kwargs['que_in_2']
-    out_que = kwargs['que_out_2']
+    in_que2 = kwargs['que_in_2']
+    out_que2 = kwargs['que_out_2']
     in_que3 = kwargs['que_in_3'] 
     out_que3 = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
@@ -164,9 +164,9 @@ def head_crack(**kwargs):
     CAM3 = kwargs['cam3']
 
     while not kwargs['stop_event'].wait(1e-9):
-        if in_que.qsize() > 0:
+        if in_que2.qsize() > 0:
             print(" ############################# t2.py start! #############################")                    
-            img_dir = in_que.pop()
+            img_dir = in_que2.pop()
             
             if not os.path.exists(img_dir):
                 print(img_dir.split("/")[-1], "is not exists!")
@@ -198,7 +198,7 @@ def head_crack(**kwargs):
                 #    in_que1.remove(img_dir)
                     #in_que1.pop()
             else:
-                out_que.put(img_dir)
+                out_que2.put(img_dir)
             
             
 
