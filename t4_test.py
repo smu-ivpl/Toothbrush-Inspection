@@ -205,13 +205,15 @@ class BackCrack(Process):
     def detect_and_color_splash(self, model, image_path=None, img_file_name=None, image_dir=None):
 
         import cv2
-        # Run model detection and generate the color splash effect
-        print("Running on {}".format(image_path))
         # Read image
         if not os.path.exists(image_path):
-            return 0
+            print(image_path, "not exists!")
+            return 0, 0
                     
         image = skimage.io.imread(image_path)
+
+        # Run model detection and generate the color splash effect
+        print("Running on {}".format(image_path))
         # Detect objects
         start = time.time()
         r = model.detect([image], verbose=1)[0]
@@ -284,8 +286,6 @@ def back_crack(**kwargs):
     out_que = kwargs['que_out_4'] 
     model = kwargs['model_bcrack']
     image_dir = kwargs['default_image_dir']
-    lock = kwargs['lock']
-    
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
@@ -300,6 +300,13 @@ def back_crack(**kwargs):
             onlyname, _ = os.path.splitext(imgname)
             imgname_bmp = onlyname + '.bmp'
             # output_imgname = os.path.join(image_path, imgname_png)
+            
+
+            if not os.path.exists(img):
+                print(imgname, "is not exists!")  
+                continue
+
+            
             error, mTime = kwargs['bcmodel'].detect_and_color_splash(model, image_path=img,  img_file_name=imgname_bmp, image_dir=image_dir)
             
             
@@ -309,7 +316,7 @@ def back_crack(**kwargs):
             cam2_dir = os.path.join(CAM2+str(cam2_num).zfill(5)+"_&Cam2Img.bmp")
             if error:
                 if not os.path.exists(img):
-                    return 0
+                    continue
                 print(f"{imgname_bmp} has back crack! error image")
                 if os.path.exists(img):
                     os.rename(img, img.split('.')[0] + '_0001.png')
@@ -321,5 +328,4 @@ def back_crack(**kwargs):
             else:
                 out_que.put(cam1_dir)
           
-
 
