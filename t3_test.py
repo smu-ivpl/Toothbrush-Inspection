@@ -32,9 +32,11 @@ class SideToothbrush(Process):
 
         try:
             if os.path.exists(imgname):
+                print("sleep for 2 sec!")
+                time.sleep(2)
                 image = cv2.imread(imgname)
             else:
-                return 0    
+                return 0
             #image = imageio.imread(imgname)
             
             image = cv2.resize(image, (700, 500))
@@ -486,8 +488,6 @@ def side_brush(**kwargs):
     out_que = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
     out_que4 = kwargs['que_out_4']
-    lock = kwargs['lock']
-
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
     CAM3 = kwargs['cam3']
@@ -500,7 +500,7 @@ def side_brush(**kwargs):
             image_path= in_que.pop()
 
             if not os.path.exists(image_path):
-                return 0
+                continue
             else:
                 _img = image_path.split("/")[-1]
                 
@@ -522,5 +522,4 @@ def side_brush(**kwargs):
                     
                 else:
                     out_que.put(cam1_dir)
-
 
