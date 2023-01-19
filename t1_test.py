@@ -23,6 +23,8 @@ ROOT_DIR = os.path.abspath("../")
 
 # Import Mask RCNN
 from PIL import Image, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.LOAD_TRUNCATED_IMAGES = True
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
@@ -86,11 +88,11 @@ class Toothbrush(Process):
         print("Running on {}".format(image_path))
         # Read image
         
-        ImageFile.LOAD_TRUNCATED_IMAGES = True
-        try:
+        if os.path.exists(image_path):
             image = skimage.io.imread(image_path)
-        finally:
-            ImageFile.LOAD_TRUNCATED_IMAGES = False
+        else:
+            print(image_path, "not exists!")
+            return 0
         # Detect objects
         # Run model detection and generate the color splash effect
         start_inference = time.time()
@@ -197,7 +199,6 @@ def head_brush(**kwargs):
     out_que3 = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
     out_que4 = kwargs['que_out_4']
-    lock = kwargs['lock']
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
@@ -212,27 +213,26 @@ def head_brush(**kwargs):
     
     while not kwargs['stop_event'].wait(1e-9):
         if in_que.qsize() > 0:
+            print(" ############################# t1.py start! #############################")   
             img_dir = in_que.pop()
 
 
             if not os.path.exists(img_dir):
-                return 0
+                print(img_dir.split("/")[-1], "is not exists!")  
+                continue
 
-
-            print("!!!!!!!!!!!!start!!!!!!!!! => ", img_dir, "!!!!!!!!")
-            print(" ############################# t1.py start! #############################")
 
             result_path = DEFAULT_IMAGE_DIR+'/result'
 
             if not os.path.isdir(result_path):
                 os.mkdir(DEFAULT_IMAGE_DIR+'/result')
-
-
             # each image in folder
             imgname = img_dir.split("/")[-1]
             onlyname = imgname.split(".")[0]
             #crop_list = Toothbrush.detect_and_color_splash(brush_model, image_path=img_dir, img_file_name=imgname)
             crop_list = kwargs['bmodel'].detect_and_color_splash(brush_model,image_path=img_dir, img_file_name=imgname)
+            if crop_list ==0:
+                continue
             result = kwargs['bmodel'].binary_classification(img_dir, onlyname, eff_model, crop_list)
             #00055_&Cam3Img.bmp
             #00051_&Cam2Img.bmp
@@ -243,9 +243,8 @@ def head_brush(**kwargs):
             
             if result:
                 if not os.path.exists(img_dir):
-                    return 0
+                    continue
 
-                
                 if os.path.exists(img_dir):
                     os.rename(img_dir, img_dir.split('.')[0] + '_1000.png')
                     
@@ -255,11 +254,9 @@ def head_brush(**kwargs):
                     if os.path.exists(cam3_dir):
                         os.rename(cam3_dir, cam3_dir.split('.')[0] + '_1000.png')
 
-                if not in_que2.empty():
-                    in_que2.remove(img_dir)
+                #if not in_que2.empty():
+                #    in_que2.remove(img_dir)
                     #in_que2.pop()
-                    
-                    
                     
             else:
                 out_que.put(img_dir)
@@ -268,4 +265,3 @@ def head_brush(**kwargs):
             print("submission : ", submission)
             
     #return result
-
