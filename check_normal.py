@@ -1,77 +1,68 @@
-from multiprocessing import Process
-import os
+import sys
+from threading import Thread, Event
+from collections import deque
+from pathlib import Path
+from multiprocessing import Process, Lock
+from t1_test import *
+from t2_test import *
+from t3_test import *
+from t4_test import *
+from check_normal import *
+import time
+import Loading_models
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from mrcnn.deque import ImageQue , Checking
+from mrcnn.deque import in_que_1, in_que_2 , in_que_3, in_que_4, out_que_1, out_que_2, out_que_3, out_que_4
+MAX_BUF_SIZE = 144
 
-set1 = set()
-set2 = set()
-set3 = set()
-set4 = set()
+DEFAULT_IMAGE_DIR = '/home/vi/VisionData/image/'
+CAM1 = '/home/vi/VisionData/image/CAM1/'
+CAM2 = '/home/vi/VisionData/image/CAM2/'
+CAM3 = '/home/vi/VisionData/image/CAM3/'
 
-class CheckingNorm(Process):
-    def __init__(self):
-        Process.__init__(self)
-
-    def run_norm(self, o1, o2, o3, o4):
-        set1 = set(o1.qtolist())  # norm1)
-        set2 = set(o2.qtolist())  # norm2)
-        set3 = set(o3.qtolist())  # norm3)
-        set4 = set(o4.qtolist())  # norm4)
-
-        #print('norm1 size: ', o1.qsize())  # norm1)
-        #print('norm2 size: ', o2.qsize())  # norm2)
-        #print('norm3 size: ', o3.qsize())  # norm3)
-        #print('norm4 size: ', o4.qsize())  # norm4)
-
-        #print('set1: ', set1)
-        #print('set2: ', set2)
-        #print('set3: ', set3)
-        #print('set4: ', set4)
-
-        norm = set1 & set2 & set3 & set4
-
-        if norm:
-            print('norm is ', norm)
-            return norm
-        else:
-            norm = None
-
-def check_norm(**kwargs):
-
+def main():
+    args = {}
     
-    while not kwargs['stop_event'].wait(1e-9):
-        output1 = kwargs['que_out_1']
-        output2 = kwargs['que_out_2']
-        output3 = kwargs['que_out_3']
-        output4 = kwargs['que_out_4']
-        print('output1: ', output1.qtolist())
-        print('output2: ', output2.qtolist())
-        print('output3: ', output3.qtolist())
-        print('output4: ', output4.qtolist())
+    args['cam1'] = CAM1
+    args['cam2'] = CAM2
+    args['cam3'] = CAM3
+    args['model_brush'] = Loading_models.brush_model
+    args['bmodel'] = Toothbrush()
+    args['cmodel'] = Toothbrushcrack()
+    args['model_eff'] = Loading_models.eff_model
+    args['model_hcrack'] = Loading_models.crack_model
     
+    args['bcmodel'] = BackCrack()
+    args['model_bcrack'] = Loading_models.B_crack_model
+    args['smodel'] = SideToothbrush()
+    args['default_image_dir'] = DEFAULT_IMAGE_DIR
+    args['que_in_1'] = in_que_1
+    args['que_out_1'] = out_que_1
+    args['que_in_2'] = in_que_2
+    args['que_out_2'] = out_que_2
+    args['que_in_3'] = in_que_3
+    args['que_out_3'] = out_que_3
+    args['que_in_4'] = in_que_4
+    args['que_out_4'] = out_que_4
     
-    output1 = kwargs['que_out_1']
-    output2 = kwargs['que_out_2']
-    output3 = kwargs['que_out_3']
-    output4 = kwargs['que_out_4']
+    args['check_norm'] = CheckingNorm()
+    args['stop_event'] = Event()
 
-    while not kwargs['stop_event'].wait(1e-9):
-        if output1.qsize() > 0 and output2.qsize() > 0 and output3.qsize() > 0 and output4.qsize() > 0:          
+    que = Thread(target=Checking)
+    t1 = Thread(target=head_brush, kwargs=args)
+    t2 = Thread(target=head_crack, kwargs=args)
+    t3 = Thread(target=side_brush, kwargs=args)
+    t4 = Thread(target=back_crack, kwargs=args)
+    norm = Thread(target=check_norm, kwargs=args)
 
-            rm_output = kwargs['check_norm'].run_norm(output1, output2, output3, output4)
-
-            if rm_output:
-                for n in rm_output:
-                    os.rename(n, n.split('.')[0] + '_0000.png')
-                    output1.remove(n)
-                    output2.remove(n)
-                    output3.remove(n)
-                    output4.remove(n)
-                
-                print('after norm1 size: ', output1.qsize())  # norm1)
-                print('after norm2 size: ', output2.qsize())  # norm2)
-                print('after norm3 size: ', output3.qsize())  # norm3)
-                print('after norm4 size: ', output4.qsize())  # norm4)
-            else:
-                print('there are not intersection!')
+    que.start()
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
+    norm.start()
     
-            
 
+if __name__ == "__main__":
+    main()
