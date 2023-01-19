@@ -84,25 +84,25 @@ class Toothbrushcrack(Process):
         # Run model detection and generate the color splash effect
         print("Running on {}".format(img_dir))
         # Read image
-        try:
+        if os.path.exists(img_dir):
             image = skimage.io.imread(img_dir)
-        except :
+        else :
             print("already finished in t1.py")
             return 0
         # Detect objects
-        start = time.time()
+        #start = time.time()
         r = model.detect([image], verbose=1)[0]
-        end = time.time()
-        total_time = end - start
+        #end = time.time()
+        #total_time = end - start
 
-        times = [total_time]
-        sumTime = 0
-        for t in times:
-            sumTime+=t
+        #times = [total_time]
+        #sumTime = 0
+        #for t in times:
+        #    sumTime+=t
 
-        meanTime = sumTime / len(times)
-        print(f"{total_time:.5f} sec")
-        print("mean time: ", meanTime)
+        #meanTime = sumTime / len(times)
+        #print(f"{total_time:.5f} sec")
+        #print("mean time: ", meanTime)
         # bounding box visualize
         class_names = ['bg','1','2','3','4']
         bbox = utils.extract_bboxes(r['masks'])
@@ -132,12 +132,12 @@ class Toothbrushcrack(Process):
         for class_n in lbList:
             if(class_n=='1' or class_n=='2' or class_n=='3'):
                 print("Saved to ", save_path)
-                return 1, meanTime
+                return 1
 
         #print("Saved to ", save_path)
         
         print(" ############################# t2.py finished #############################")
-        return 0, meanTime
+        return 0
 
 
 
@@ -158,7 +158,6 @@ def head_crack(**kwargs):
     out_que3 = kwargs['que_out_3'] 
     in_que4 = kwargs['que_in_4'] 
     out_que4 = kwargs['que_out_4']
-    lock = kwargs['lock']
 
     CAM1 = kwargs['cam1']
     CAM2 = kwargs['cam2']
@@ -170,19 +169,20 @@ def head_crack(**kwargs):
             img_dir = in_que.pop()
             
             if not os.path.exists(img_dir):
-                return 0
+                print(img_dir.split("/")[-1], "is not exists!")
+                continue
 
             
             imgname = img_dir.split("/")[-1]
             onlyname = imgname.split(".")[0]
-            error, mTime = kwargs['cmodel'].detect_and_color_splash(headcrack_model, image_path=folder_dir,  img_file_name=imgname, img_dir = img_dir)
+            error= kwargs['cmodel'].detect_and_color_splash(headcrack_model, image_path=folder_dir,  img_file_name=imgname, img_dir = img_dir)
             cam2_num = int(imgname.split("_")[0]) + 5
             cam3_num = int(imgname.split("_")[0]) + 10
             cam2_dir = os.path.join(CAM2+str(cam2_num).zfill(5)+"_&Cam2Img.bmp")
             cam3_dir = os.path.join(CAM3+str(cam3_num).zfill(5)+"_&Cam3Img.bmp")
             if error:
                 if not os.path.exists(img_dir):
-                    return 0
+                    continue
                 
                 print(f"{imgname} has head crack error")
                 if os.path.exists(img_dir):
@@ -194,8 +194,8 @@ def head_crack(**kwargs):
                     if os.path.exists(cam3_dir):
                         os.rename(cam3_dir, cam3_dir.split('.')[0] + '_0100.png')
 
-                if not in_que1.empty():
-                    in_que1.remove(img_dir)
+                #if not in_que1.empty():
+                #    in_que1.remove(img_dir)
                     #in_que1.pop()
             else:
                 out_que.put(img_dir)
