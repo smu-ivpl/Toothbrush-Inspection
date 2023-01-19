@@ -51,7 +51,7 @@ class StackingQue(Process):
 
     def run(que, item):
         que.put(item)
-        print("size = ", que.qsize())
+        #print("size = ", que.qsize())
 
 
 class Target():
@@ -116,7 +116,7 @@ class Handler2(FileSystemEventHandler):
         # print(event)
         if event.src_path.endswith('.bmp') and event.is_directory is False:
             Handler2.i += 1
-            print('Handler2.i: ', Handler2.i)
+            #print('Handler2.i: ', Handler2.i)
             cam2_image_dir = event.src_path
             if Handler2.i > 5:    
                 StackingQue.run(in_que_3, cam2_image_dir)
@@ -135,12 +135,13 @@ class Handler3(FileSystemEventHandler):
         # print(event)
         if event.src_path.endswith('.bmp') and event.is_directory is False:
             Handler3.i += 1
-            print('Handler3.i: ', Handler3.i)
+            #print('Handler3.i: ', Handler3.i)
             
             cam3_image_dir = event.src_path
+            print('cam3_image_dir: ', cam3_image_dir)
             if Handler3.i > 10:    
                 StackingQue.run(in_que_4, cam3_image_dir)
-            
+                #print('in_que_4 size: ', in_que_4.qsize())
             
             # print('out_que_4 size: ', out_que_4.qsize())
             '''
@@ -156,5 +157,4 @@ def Checking():
     w = Target()
     w.run()
     
-
 
