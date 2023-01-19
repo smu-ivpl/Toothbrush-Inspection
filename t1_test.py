@@ -190,8 +190,8 @@ def head_brush(**kwargs):
     
     brush_model = kwargs['model_brush']
     eff_model = kwargs['model_eff']
-    in_que= kwargs['que_in_1']
-    out_que= kwargs['que_out_1']
+    in_que1= kwargs['que_in_1']
+    out_que1= kwargs['que_out_1']
 
     in_que2 = kwargs['que_in_2'] 
     out_que2 = kwargs['que_out_2'] 
@@ -212,9 +212,9 @@ def head_brush(**kwargs):
     
     
     while not kwargs['stop_event'].wait(1e-9):
-        if in_que.qsize() > 0:
+        if in_que1.qsize() > 0:
             print(" ############################# t1.py start! #############################")   
-            img_dir = in_que.pop()
+            img_dir = in_que1.pop()
 
 
             if not os.path.exists(img_dir):
@@ -259,7 +259,7 @@ def head_brush(**kwargs):
                     #in_que2.pop()
                     
             else:
-                out_que.put(img_dir)
+                out_que1.put(img_dir)
 
             submission[onlyname] = result
             print("submission : ", submission)
