@@ -208,7 +208,7 @@ class BackCrack(Process):
         # Read image
         if not os.path.exists(image_path):
             print(image_path, "not exists!")
-            return 0, 0
+            return 0 #, 0
                     
         image = skimage.io.imread(image_path)
 
@@ -235,8 +235,8 @@ class BackCrack(Process):
         file_name_bb = "bb_splash_{}".format(img_file_name)
         save_path_bb = os.path.join(image_dir, 'result', file_name_bb)
 
-        display_img = cv2.imread(image_path, 3)
-        display_img = cv2.resize(display_img, (int(display_img.shape[1]*0.4), int(display_img.shape[0]*0.4)))
+        #display_img = cv2.imread(image_path, 3)
+        #display_img = cv2.resize(display_img, (int(display_img.shape[1]*0.4), int(display_img.shape[0]*0.4)))
 
         # cv2.imshow("input image", display_img)
 
@@ -258,11 +258,11 @@ class BackCrack(Process):
         for class_n in lbList:
             if(class_n=='1'):  # or class_n=='2' or class_n=='3'):
                 print("Saved to ", save_path)
-                return 1, meanTime
+                return 1 #, meanTime
 
         print("Saved to ", save_path)
         print("############################## t4.py finished ###################################")    
-        return 0, meanTime
+        return 0 #, meanTime
 
 
 
@@ -282,8 +282,8 @@ def back_crack(**kwargs):
     out_que2 = kwargs['que_out_2'] 
     in_que3 = kwargs['que_in_3'] 
     out_que3 = kwargs['que_out_3'] 
-    in_que = kwargs['que_in_4'] 
-    out_que = kwargs['que_out_4'] 
+    in_que4 = kwargs['que_in_4'] 
+    out_que4 = kwargs['que_out_4'] 
     model = kwargs['model_bcrack']
     image_dir = kwargs['default_image_dir']
 
@@ -293,9 +293,10 @@ def back_crack(**kwargs):
 
 
     while not kwargs['stop_event'].wait(1e-9):
-        if in_que.qsize() > 0:
+        print("t4.py inque4 size!!  =  ",in_que4.qsize())
+        if in_que4.qsize() > 0:
             print(" ############################# t4.py start! #############################")
-            img = in_que.pop()
+            img = in_que4.pop()
             imgname = img.split("/")[-1]
             onlyname, _ = os.path.splitext(imgname)
             imgname_bmp = onlyname + '.bmp'
@@ -307,7 +308,7 @@ def back_crack(**kwargs):
                 continue
 
             
-            error, mTime = kwargs['bcmodel'].detect_and_color_splash(model, image_path=img,  img_file_name=imgname_bmp, image_dir=image_dir)
+            error = kwargs['bcmodel'].detect_and_color_splash(model, image_path=img,  img_file_name=imgname_bmp, image_dir=image_dir)
             
             
             cam1_num = int(imgname.split("_")[0]) - 10
@@ -316,8 +317,8 @@ def back_crack(**kwargs):
             cam2_dir = os.path.join(CAM2+str(cam2_num).zfill(5)+"_&Cam2Img.bmp")
             if error:
                 if not os.path.exists(img):
+                    print(f"{imgname_bmp} has back crack! error image")
                     continue
-                print(f"{imgname_bmp} has back crack! error image")
                 if os.path.exists(img):
                     os.rename(img, img.split('.')[0] + '_0001.png')
                     if os.path.exists(cam1_dir):
@@ -326,6 +327,6 @@ def back_crack(**kwargs):
                         os.rename(cam2_dir, cam2_dir.split('.')[0] + '_0001.png')
               
             else:
-                out_que.put(cam1_dir)
+                out_que4.put(cam1_dir)
           
 
