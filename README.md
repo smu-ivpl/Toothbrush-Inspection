@@ -85,6 +85,16 @@ python toothbrush_back_final.py
 
 
 
+#### 2) inference 4 modules in real time (faster .ver using multiprocess)
+
+~~~
+python multi_que.py
+~~~
+
+
+
+
+
 ### 3. Visualize
 
 
